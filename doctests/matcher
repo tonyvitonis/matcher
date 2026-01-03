@@ -1,0 +1,42 @@
+>>> from matcher.matcher import Matcher
+
+>>> def match_all(*cases):
+...    result = [ str(e.matches(case)) for case in cases ]
+...    return " ".join(result)
+...
+
+>>> e = Matcher('a or b')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['r', 'b'], ['r'])
+'True True True True False'
+
+>>> e = Matcher('a and b')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['r', 'b'], ['r'])
+'False False True False False'
+
+>>> e = Matcher('a and (b or c)')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['a', 'c'], ['c'], ['d', 'e'])
+'False False True True False False'
+
+>>> e = Matcher('(a and b) or c')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['a', 'c'], ['c'], ['d', 'e'])
+'False False True True True False'
+
+>>> e = Matcher('a and b or c')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['a', 'c'], ['c'], ['d', 'e'])
+'False False True True True False'
+
+>>> e = Matcher('a and not b')
+>>> match_all(['a'], ['b'], ['a', 'b'], ['a', 'c'], ['c'], ['d', 'e'])
+'True False False True False False'
+
+>>> e = Matcher('a* or *b')
+>>> match_all(['ab'], ['acd'], ['cdb'], ['ba'])
+'True True True False'
+
+>>> e = Matcher('not ab*')
+>>> match_all(['ab'], ['abc'], ['ad'], ['cb'])
+'False False True True'
+
+>>> e = Matcher('not *ab')
+>>> match_all(['ab'], ['abc'], ['cab'], ['cb'])
+'False True False True'

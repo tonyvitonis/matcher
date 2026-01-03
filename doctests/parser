@@ -1,0 +1,79 @@
+>>> from matcher import parser
+
+>>> parser.tree_for('a or b')
+('or', ('a', 'b'))
+
+>>> parser.tree_for('a and b')
+('and', ('a', 'b'))
+
+>>> parser.tree_for('a and (b or c)')
+('and', ('a', ('or', ('b', 'c'))))
+
+>>> parser.tree_for('(a and b) or c')
+('or', (('and', ('a', 'b')), 'c'))
+
+>>> parser.tree_for('a and b or c')
+('or', (('and', ('a', 'b')), 'c'))
+
+>>> parser.tree_for('a and not b')
+('and', ('a', ('not', ('', 'b'))))
+
+>>> parser.tree_for('(a or b) and (c or d)')
+('and', (('or', ('a', 'b')), ('or', ('c', 'd'))))
+
+>>> parser.tree_for('or b')
+Traceback (most recent call last):
+Exception: syntax error at 'or b'
+
+>>> parser.tree_for('a and')
+Traceback (most recent call last):
+Exception: syntax error at 'a and'
+
+>>> parser.tree_for('a and not')
+Traceback (most recent call last):
+Exception: syntax error at 'not'
+
+>>> parser.tree_for('a and b not')
+Traceback (most recent call last):
+Exception: syntax error at 'b not'
+
+>>> parser.tree_for('in*side')
+Traceback (most recent call last):
+Exception: syntax error at 'in*side'
+
+>>> parser.tree_for('space between')
+Traceback (most recent call last):
+Exception: syntax error at 'space between'
+
+>>> parser._is_valid('and b')
+False
+
+>>> parser._is_valid('a or')
+False
+
+>>> parser._is_valid('a and b')
+True
+
+>>> parser._is_valid_tag_matcher('abc')
+True
+
+>>> parser._is_valid_tag_matcher('ab*')
+True
+
+>>> parser._is_valid_tag_matcher('*bc')
+True
+
+>>> parser._is_valid_tag_matcher('a*c')
+False
+
+>>> parser._is_valid_tag_matcher('*a*')
+False
+
+>>> parser._outermost('a and b')
+(0, 6)
+
+>>> parser._outermost('a and (b or c)')
+(0, 5)
+
+>>> parser._outermost('(a and b) or (c and d)')
+(9, 12)

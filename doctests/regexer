@@ -1,0 +1,14 @@
+>>> from matcher.regexer import Regexer
+
+>>> regexer = Regexer(regex="(at|an)", to_pattern="utton")
+>>> regexer.apply_to("batman")
+'buttonmutton'
+
+>>> regexer = Regexer(regex="(.*) (.*)", to_pattern="{1}, {0}")
+>>> regexer.apply_once_to("gordon bennett")
+'bennett, gordon'
+
+>>> regexer = Regexer(regex="(.*) (.*)", to_pattern="{2}, {0}")
+>>> regexer.apply_once_to("gordon bennett")
+Traceback (most recent call last):
+IndexError: tuple index out of range

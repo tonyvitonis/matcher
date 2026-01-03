@@ -1,0 +1,116 @@
+>>> from matcher import querytools
+
+>>> querytools.normalized("  ((  x )  ) and (((y\t  ) )   )    r   ")
+'x and y r'
+
+>>> querytools.normalized("(a or b)and(c or d)")
+'(a or b) and (c or d)'
+
+>>> querytools.normalized("not ((a or b) and (c or d))")
+'not ((a or b) and (c or d))'
+
+>>> querytools.normalized("(((a and b) or ((c))))")
+'(a and b) or c'
+
+>>> querytools.normalized("abc(def)")
+'abc def'
+
+>>> querytools.normalized("(a b)(c d)")
+Traceback (most recent call last):
+Exception: consecutive groups
+
+>>> querytools.normalized("(a)(b)")
+Traceback (most recent call last):
+Exception: consecutive groups
+
+>>> querytools._normalize_spaces("  ((  \tx )  )     ")
+'((x))'
+
+>>> querytools._normalize_parens("((((a))) or ((b)))")
+'a or b'
+
+>>> querytools._normalize_parens("((()))")
+''
+
+>>> querytools._normalize_parens("(()))")
+Traceback (most recent call last):
+Exception: unbalanced parentheses
+
+>>> querytools._normalize_parens("( ) ( )")
+Traceback (most recent call last):
+Exception: consecutive groups
+
+>>> querytools._parens_are_balanced("(abc) or (def)")
+True
+
+>>> querytools._parens_are_balanced("(1(2)1(2)1(2(3)2(3)2)1)")
+True
+
+>>> querytools._parens_are_balanced("(abc) or (def")
+False
+
+>>> querytools._parens_are_balanced(")(")
+False
+
+>>> querytools._parens_are_balanced("(()))")
+False
+
+>>> querytools._parens_are_balanced("")
+True
+
+>>> querytools._parens_are_balanced(")")
+False
+
+>>> querytools._expand_before_open_paren("a(a(")
+'a (a ('
+
+>>> querytools._expand_after_close_paren(")a)a")
+') a) a'
+
+>>> querytools._remove_doubled_parens("(((x and y))) and ((z))")
+'(x and y) and (z)'
+
+>>> querytools._remove_doubled_parens("((((x and y))) and ((z)))")
+'((x and y) and (z))'
+
+>>> querytools._remove_parens_not_containing_spaces("(x) and (y)")
+'x and y'
+
+>>> querytools._remove_parens_not_containing_spaces("(x) and (y and z)")
+'x and (y and z)'
+
+>>> querytools._remove_parens_not_containing_spaces("(((r))) and (((r)))")
+'r and r'
+
+>>> querytools._remove_parens_not_containing_spaces("((()))")
+''
+
+>>> querytools._remove_parens_not_containing_spaces("(a or ((b)) and ()c)")
+'(a or b and c)'
+
+>>> querytools._remove_outermost_parens("(((x and y and z)))")
+'x and y and z'
+
+>>> querytools._remove_outermost_parens("(x and y) and z")
+'(x and y) and z'
+
+>>> querytools._outermost_parens_are_paired("((a or b) and c)")
+True
+
+>>> querytools._outermost_parens_are_paired("(a or b) and (c or d)")
+False
+
+>>> querytools._outermost_parens_are_paired("a or b and c or d")
+False
+
+>>> querytools.leftmost_paren_group("(abc)")
+(0, 4)
+
+>>> querytools.leftmost_paren_group("abc or (defg)")
+(7, 12)
+
+>>> querytools.leftmost_paren_group("(unbalanced")
+(-1, -1)
+
+>>> querytools.leftmost_paren_group("no parens")
+(-1, -1)
